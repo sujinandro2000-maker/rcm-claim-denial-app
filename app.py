@@ -89,6 +89,4 @@ with open(
 ) as f:
     f.write(code)
 
-print("app.py successfully updated with absolute path resolution!")
-                st.success("✅ **Low Denial Risk** — Likely to be approved/paid.")
-
+print("app.py indentation fixed successfully!")
