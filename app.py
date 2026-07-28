@@ -1,7 +1,8 @@
-import streamlit as st
+code = """import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+from pathlib import Path
 
 # Page configuration
 st.set_page_config(page_title="RCM Claim Denial Predictor", layout="wide")
@@ -9,14 +10,17 @@ st.set_page_config(page_title="RCM Claim Denial Predictor", layout="wide")
 st.title("🏥 RCM Claim Denial Prediction App")
 st.write("Predict whether a healthcare claim will be **Paid** or **Denied** before submission.")
 
+# Locate current directory dynamically
+BASE_DIR = Path(__file__).resolve().parent
+
 # 1. Load Model & Artifacts
 @st.cache_resource
 def load_artifacts():
     try:
-        model = joblib.load('claim_denial_model.joblib')
-        feature_names = joblib.load('feature_names.joblib')
-        label_encoders = joblib.load('label_encoders.joblib')
-        ui_options = joblib.load('ui_options.joblib')
+        model = joblib.load(BASE_DIR / 'claim_denial_model.joblib')
+        feature_names = joblib.load(BASE_DIR / 'feature_names.joblib')
+        label_encoders = joblib.load(BASE_DIR / 'label_encoders.joblib')
+        ui_options = joblib.load(BASE_DIR / 'ui_options.joblib')
         return model, feature_names, label_encoders, ui_options
     except Exception as e:
         st.error(f"Error loading model files: {e}")
@@ -51,7 +55,7 @@ if model is not None:
                 else:
                     input_data[col_name] = selected_val
 
-    # Explicit handling for Prior Auth Required (Toggle / Checkbox)
+    # Explicit handling for Prior Auth Required (Toggle)
     with col2:
         prior_auth = st.toggle("Prior Authorization Required?", value=False)
         input_data['prior_auth_required'] = 1 if prior_auth else 0
@@ -59,7 +63,6 @@ if model is not None:
     # 3. Prediction Action
     st.markdown("---")
     if st.button("🔮 Predict Claim Outcome", type="primary", use_container_width=True):
-        # Ensure DataFrame columns match exact order of feature_names
         input_df = pd.DataFrame([input_data])[feature_names]
         
         # Predict probability & class
@@ -76,5 +79,16 @@ if model is not None:
             if proba >= 0.5:
                 st.error("🚨 **High Denial Risk** — Review claim details prior to submission.")
             else:
+                st.success("✅ **Low Denial Risk** — Likely to be approved/paid.")
+"""
+
+with open(
+    r"C:\Users\Sujin Andro\OneDrive\Desktop\RCM ML\app.py",
+    "w",
+    encoding="utf-8",
+) as f:
+    f.write(code)
+
+print("app.py successfully updated with absolute path resolution!")
                 st.success("✅ **Low Denial Risk** — Likely to be approved/paid.")
 
